@@ -37,8 +37,28 @@ POST hamlet-raw/_doc
 </details>
 
 ## Remove from `hamlet` the documents that have either `"KING CLAUDIUS"` or `"LAERTES"` as the value of `speaker`
-TODO
-
+[Delete by Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-delete-by-query.html)
+[Boolean Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-bool-query.html) for "OR" searches
+[Full text Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/full-text-queries.html)
+<details>
+    <summary>Solution</summary>
+```json
+POST hamlet/_delete_by_query
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"match": { "speaker": "KING CLAUDIUS"}},
+        {"match": {
+          "speaker": "LAERTES"
+        }}
+        ],
+      "minimum_should_match": 1
+    }
+  }
+}
+```
+</details>
 
 # Exam Objectives
 ## Data Management
