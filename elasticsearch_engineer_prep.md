@@ -17,6 +17,9 @@ whose exercises are included almost as-is, and was a major inspiration for the p
 
 # <a id="practical_guide">Practical Guide</a>
 
+REQUIRED SETUP:
+ - create an indice `hamlet-raw`
+
 ## Add a document to `hamlet-raw`, so that the document (i) has id "1", (ii) has default type, (iii) has one field named `line` with value "To be, or not to be: that is the question"
 <details>
     <summary>Solution</summary>
@@ -109,13 +112,52 @@ PUT hamlet-raw
 car `number_of_shards` vaut 1 par défaut.
 </details>
 
+#### Create the index `multitype` with (i) a `geoloc` field of type `geo_point` (ii) an `id` field of type `keyword` (iii) a field `phrase` of type `text` with the analyzer `french` (iv) a field `ip` of type `ip` and (v) an alias field to `phrase` named `french`.
+
+If you wonder about any of these types, see [mapping types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html)
+
+<details>
+    <summary>Solution</summary>
+
+```json
+PUT multitype
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "geoloc": {
+        "type": "geo_point"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "phrase": {
+        "type": "text",
+        "analyzer": "french"
+      },
+      "ip": {
+        "type": "ip"
+      },
+      "french": {
+        "type": "alias",
+        "path": "phrase"
+      }
+    }
+  }
+}
+```
+</details>
+
+
+  
 ### Use the Data Visualizer to upload a text file into Elasticsearch
 ### Define and use an index template for a given pattern that satisfies a given set of requirements
-#### Create the index template `hamlet_template`, so that the template (i) matches any index that starts by "hamlet_" or "hamlet-", (ii) allocates one primary shard and no replicas for each matching index 
 REQUIRED SETUP:
- -   a running Elasticsearch cluster with at least one node and a Kibana instance,
- -  the cluster has no index with name `hamlet`, 
+ - a running Elasticsearch cluster with at least one node and a Kibana instance,
+ - the cluster has no index with name `hamlet`, 
  - the cluster has no template that applies to indices starting by `hamlet`
+#### Create the index template `hamlet_template`, so that the template (i) matches any index that starts by "hamlet_" or "hamlet-", (ii) allocates one primary shard and no replicas for each matching index 
+
  
  [Index Template](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/index-templates.html)
 <details>
@@ -308,6 +350,9 @@ Now inspect the newly created index's mapping to assert the mapping follows the 
 ### Define an index template that creates a new data stream
 
 ## <a id="searching_data">Searching Data</a>
+REQUIRED SETUP:
+ - the cluster has an index with name `multitype`
+ - the `multitype` index's mapping matches the one from the [index creation](#create_index_with_settings) section
 ### Write and execute a search query for terms and/or phrases in one or more fields of an index
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
 ### Write an asynchronous search
