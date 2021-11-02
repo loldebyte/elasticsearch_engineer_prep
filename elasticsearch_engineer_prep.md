@@ -53,6 +53,7 @@ POST hamlet-raw/_doc
 [Full text Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/full-text-queries.html)
 <details>
     <summary>Solution</summary>
+
 ```json
 POST hamlet/_delete_by_query
 {
@@ -76,6 +77,7 @@ POST hamlet/_delete_by_query
 ### <a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a>
 <details>
     <summary>Defining an index:</summary>
+
 ```json
 PUT <index_name>
 {
@@ -148,7 +150,8 @@ PUT multitype
 ```
 </details>
 
-
+#### 
+[TODO]: # (TODO)
   
 ### Use the Data Visualizer to upload a text file into Elasticsearch
 ### Define and use an index template for a given pattern that satisfies a given set of requirements
@@ -162,6 +165,7 @@ REQUIRED SETUP:
  [Index Template](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/index-templates.html)
 <details>
     <summary>Create the index template</summary>
+
 ```json
 PUT _index_template/hamlet_template
 {
