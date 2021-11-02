@@ -358,6 +358,34 @@ REQUIRED SETUP:
  - the cluster has an index with name `multitype`
  - the `multitype` index's mapping matches the one from the [index creation](#create_index_with_settings) section
 ### Write and execute a search query for terms and/or phrases in one or more fields of an index
+[Search your Data](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/search-your-data.html)
+
+#### Exact search on a string field
+First, lets search for all documents containing `"composition"` in their `french` field.
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET multitype/_search
+{
+  "query": {
+    "match": {
+      "french": "composition"
+    }
+  }
+}
+```
+</details>
+
+#### 
+
+#### Simple search on multiple fields
+
+[Disjunction max](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-dis-max-query.html) aka `dis_max`.
+
+[TODO]: # (TODO)
+
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
 ### Write an asynchronous search
 ### Write and execute metric and bucket aggregations
