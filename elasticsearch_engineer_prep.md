@@ -72,6 +72,128 @@ POST hamlet/_delete_by_query
 ```
 </details>
 
+## Index a geoJSON without using kibana's UI
+[Spatial Data Types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html#spatial_datatypes)
+
+In this exercise, we will learn how to index a geojson file into elasticsearch with two methods :
+ - Using `cURL`
+ - Using python's `elasticsearch` package
+
+The geoJSON we will work on is `carte_judiciaire.geojson` in `./course_material`.
+
+First, try to directly upload the file into the `carte_judicaire` index. Lets not worry about mappings yet, even though as you may know geographic data will usually require an explicit mapping. You might want to have a look [there](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-index_.html).
+
+<details>
+    <summary>curl command to index into carte_judiciaire</summary>
+
+```bash
+curl -H 'Content-Type: application/x-ndjson' -XPOST '127.0.0.1:9200/carte_judiciaire/_doc' --data-binary @carte_judiciaire.geojson
+```
+</details>
+
+/!\ IMPORTANT : if you have activated security on your local instance do not forget to include credentials : `-u elasticsearch_username:elasticsearch_password` /!\
+
+When you've managed to do that, investigate the outcome : what does the mapping look like ? What does the data loaded in it look like ?
+
+<details>
+    <summary>What you should notice</summary>
+
+We only have a single document, because we used the `_doc` endpoint, and it can index only a single document. We want to have a document per polygon !
+</details>
+
+I encourage you to try to fiddle around with the json file, curl and kibana's devtools console. When you feel stuck or feel like you're about to do a drastic change, open the following spoiler.
+
+<details>
+    <summary>The problem</summary>
+
+This geojson is a collection of `Features`, ie its a JSON containing a list of other JSONs. We want to index the JSONs in the list, individually.\
+Therefor, we have to change the source file itself !\
+We are going to do this in python.\
+`> But you said we'd learn how to do it with curl !!`\
+Yes, we will _index_ the document with curl, but we still need to change it, and we will do that in python. In the real world, this is useful because you may not be able to connect to your ES instance in python. 
+</details>
+
+[bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-bulk.html)
+
+[TODO]: # (readaction)
+<details>
+    <summary>The script</summary>
+
+```python3
+import json
+import argparse
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument("-f", "--file-path", default=None, type=str, help="chemin vers le fichier à modifier")
+    parser.add_argument("-i", "--index", default=None, type=str, help="nom de l'index dans lequel le fichier doit être chargé")
+    parser.add_argument("-o", "--outfile", default=None, type=str, help="fichier dans lequel sauvegarder la requête bulk")
+    args = parser.parse_args()
+    return args.file_path, args.index, args.outfile
+
+
+def main():
+    file, index, out = get_args()
+    with open(file) as fp:
+        geojson = json.load(fp)
+    index = {"index":{"_index":index}}
+    with open(out, mode="a") as fp:
+        for feature in geojson["features"]:
+            json.dump(index, fp)  # the action metadata
+            fp.write('\n')  # _bulk expects a ndjson
+            json.dump(feature, fp)  # the action, ie field/value pair(s).
+            fp.write('\n')
+        fp.write('\n\n')
+
+if __name__ == "__main__":
+    main()
+```
+</details>
+
+
+<details>
+    <summary>bulk op</summary>
+
+```bash
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @your_file_name
+```
+</details>
+
+<details>
+    <summary>mapping</summary>
+
+```json
+PUT carte_judiciaire
+{
+  "mappings" : {
+      "properties" : {
+        "geometry" : {
+            "type": "geo_shape"
+        },
+        "properties" : {
+          "properties" : {
+            "nom" : {
+              "type" : "long"
+            }
+          }
+        },
+        "type" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
+    }
+}
+```
+</details>
+
+
 # **Exam Objectives**
 ## Data Management
 ### <a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a>
