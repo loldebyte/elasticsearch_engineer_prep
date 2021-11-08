@@ -73,8 +73,6 @@ POST hamlet/_delete_by_query
 </details>
 
 ## Index a geoJSON without using kibana's UI
-[Spatial Data Types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html#spatial_datatypes)
-
 In this exercise, we will learn how to index a geojson file into elasticsearch with two methods :
  - Using `cURL`
  - Using python's `elasticsearch` package
@@ -106,20 +104,45 @@ I encourage you to try to fiddle around with the json file, curl and kibana's de
 <details>
     <summary>The problem</summary>
 
-This geojson is a collection of `Features`, ie its a JSON containing a list of other JSONs. We want to index the JSONs in the list, individually.\
+This geojson is a collection of `features`, ie its a JSON containing a list of other JSONs. We want to index the JSONs in the list, individually.\
 Therefor, we have to change the source file itself !\
-We are going to do this in python.\
+The example provided will be doing this in python, but you are free to do it otherwise.\
 `> But you said we'd learn how to do it with curl !!`\
-Yes, we will _index_ the document with curl, but we still need to change it, and we will do that in python. In the real world, this is useful because you may not be able to connect to your ES instance in python. 
+Yes, we will _index_ the document with curl, but we still need to change it, and i will do that in python. In the real world, this is useful because you may not be able to connect to your ES instance in python.
 </details>
 
-[bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-bulk.html)
+Since we want to index multiple documents, we will want to use the [bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-bulk.html).\
+It is much more important that you understand what needs to be done rather than actually implement it, so do think about how you would create a bulkable ndjson from the original `carte_judiciaire.geojson` file.
 
-[TODO]: # (readaction)
 <details>
-    <summary>The script</summary>
+    <summary>I'm stuck, what do i need to do & how ?</summary>
 
-```python3
+As said in the previous spoiler, we want to index each and every JSON in the `features` list. Indexing multiple documents requires using the `_bulk` endpoint, which expects a file in the form of :
+```
+action_and_meta_data\n
+optional_source\n
+```
+This information is in the [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-bulk.html#docs-bulk-api-desc), and it is the crucial part for this exercise.
+</details>
+
+<details>
+    <summary>Solution : bulkable format</summary>
+
+Our reformatted geojson will look like :
+```json
+{"index": {"_index": "carte_judiciaire"}}
+{<first element in the features list>}
+{"index": {"_index": "carte_judiciaire"}}
+{<second element in the features list>}
+...
+```
+</details>
+
+
+<details>
+    <summary>Solution : example script</summary>
+
+```python
 import json
 import argparse
 
@@ -144,24 +167,93 @@ def main():
             fp.write('\n')  # _bulk expects a ndjson
             json.dump(feature, fp)  # the action, ie field/value pair(s).
             fp.write('\n')
-        fp.write('\n\n')
+        fp.write('\n')
 
 if __name__ == "__main__":
     main()
 ```
 </details>
 
+Now, reformat your geojson using the script :
+```bash
+python ./create_bulkable_geojson.py -f carte_judiciaire.geojson -i carte_judiciaire -o bulkable_carte_judiciaire.ndjson
+```
+This snipped is included as an example, you're free to use whatever arguments you want. We now want to index the newly created `bulkable_carte_judicaire.ndjson`, using curl.\
+If you have no idea how to do that, then you haven't read the [bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-bulk.html) docs carefully enough !
 
 <details>
     <summary>bulk op</summary>
 
+What needs to be done here is simply to curl onto the `_bulk` endpoint :
 ```bash
-curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @your_file_name
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @bulkable_carte_judiciaire.ndjson
 ```
+This request only works on a local elasticsearch instance with no security enabled. Dont forget to change `bulkable_carte_judiciaire.ndjson` if you need to !
 </details>
 
+Now that this is done, you may think we've just done it, but in fact we've one last obstacle to overcome : check the index's mapping.
+
 <details>
-    <summary>mapping</summary>
+    <summary>Solution</summary>
+
+To get the mapping :
+```json
+GET carte_judiciaire/_mapping
+```
+Which should output :
+```json
+{
+  "carte_judiciare" : {
+    "mappings" : {
+      "properties" : {
+        "geometry" : {
+          "properties" : {
+            "coordinates" : {
+              "type" : "float"
+            },
+            "type" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            }
+          }
+        },
+        "properties" : {
+          "properties" : {
+            "nom" : {
+              "type" : "long"
+            }
+          }
+        },
+        "type" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+Which should look bad to you !
+</details>
+
+Looks like elasticsearch's [dynamic mapping](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/dynamic-mapping.html) didnt understand `geometry` nor `coordinates` as [Spatial Data Types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html#spatial_datatypes). The default dynamic mapping is really hesistant about parsing data as spacial data, so you will likely need to provide an explicit mapping or an [index_template](#index_template).\
+In general, i would suggest staying as far away as possible from dynamic mapping, but this is to be discussed elsewhere.\
+What we need to do now : change the mapping, delete the index, and bulk once more. Obviously in production you would have to create the mapping beforehands.\
+To change the mapping i suggest copying the return from `GET carte_judicaire/_mapping` and start from there.\
+When you're stuck or think you've made it, check the correction below.
+
+<details>
+    <summary>Mapping</summary>
 
 ```json
 PUT carte_judiciaire
@@ -191,8 +283,15 @@ PUT carte_judiciaire
     }
 }
 ```
+> Why use `geo_shape` and not 'type X' ?
+
+Because our data is polygons, we cannot use `point` or `geo_point`. But `shape` is much trickier. In the [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/shape.html) one can read that :
+ > In GeoJSON and WKT, and therefore Elasticsearch, the correct coordinate order is (X, Y) within coordinate arrays. This differs from many Geospatial APIs (e.g., **geo_shape**) that typically use the colloquial latitude, longitude (Y, X) ordering.
+
+ Our data uses the (Y, X) ordering, and thus, the correct type is `geo_shape` !
 </details>
 
+To assert everything works as intended, you can create a map layer that shows the french jurisdiction areas.
 
 # **Exam Objectives**
 ## Data Management
@@ -276,7 +375,7 @@ PUT multitype
 [TODO]: # (TODO)
   
 ### Use the Data Visualizer to upload a text file into Elasticsearch
-### Define and use an index template for a given pattern that satisfies a given set of requirements
+### <a id="index_template">Define and use an index template for a given pattern that satisfies a given set of requirements</a>
 REQUIRED SETUP:
  - a running Elasticsearch cluster with at least one node and a Kibana instance,
  - the cluster has no index with name `hamlet`, 
