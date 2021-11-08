@@ -283,7 +283,7 @@ PUT carte_judiciaire
     }
 }
 ```
-> Why use `geo_shape` and not 'type X' ?
+> Why use `geo_shape` and not `type X` ?
 
 Because our data is polygons, we cannot use `point` or `geo_point`. But `shape` is much trickier. In the [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/shape.html) one can read that :
  > In GeoJSON and WKT, and therefore Elasticsearch, the correct coordinate order is (X, Y) within coordinate arrays. This differs from many Geospatial APIs (e.g., **geo_shape**) that typically use the colloquial latitude, longitude (Y, X) ordering.
@@ -292,6 +292,85 @@ Because our data is polygons, we cannot use `point` or `geo_point`. But `shape` 
 </details>
 
 To assert everything works as intended, you can create a map layer that shows the french jurisdiction areas.
+
+Now let's see how we could've done the bulk operation in python.\
+First of all, create an index `carte_judiciaire2` with the exact same mapping as `carte_judiciare`.\
+Now using the elasticsearch python package, connect to your local elasticsearch using [Elasticsearch](https://elasticsearch-py.readthedocs.io/en/v7.15.1/api.html#elasticsearch) and then use [streaming_bulk](https://elasticsearch-py.readthedocs.io/en/v7.15.1/helpers.html) to bulk the documents.\
+Because this is not a python tutorial and this is not a trivial task _and_ the logic has already been explained, i'll just provide you with a script that does it, but i encourage you to try to write one on your own !
+
+<details>
+    <summary>bulk_into_elasticsearch.py</summary>
+
+```python
+import json
+import elasticsearch.helpers
+import ssl
+import argparse
+
+def export_file_into_elastic(file, indice, config):
+    es = get_es_instance(config)
+
+    actions = ({"_index": indice,
+                 "_source": feature} for feature in file["features"])
+    success, failed, errors = 0, 0, []
+    for ok, item in elasticsearch.helpers.streaming_bulk(es, actions, raise_on_error=False):
+        if not ok:
+            errors.append(item)
+            failed += 1
+        else:
+            success += 1
+    print(f"{success} successfully inserted into {indice}")
+    if errors:
+        print(f"{failed} errors detected\nError details : {errors}")
+        
+def get_es_instance(conf):
+    """Instanciates an Elasticsearch connection instance based on connection parameters from the configuration"""
+    _host = (conf.get("user"), conf.get("pwd"))
+    if _host == (None, None):
+        _host = None
+    if "cafile" in conf:
+        _context = ssl.create_default_context(cafile=conf["cafile"])
+        es_instance = elasticsearch.Elasticsearch(
+            conf.get("host", "localhost"),
+            http_auth=_host,
+            use_ssl=True,
+            scheme=conf["scheme"],
+            port=conf["port"],
+            ssl_context=_context,
+        )
+    else:
+        es_instance = elasticsearch.Elasticsearch(
+            conf.get("host", "localhost"),
+            http_auth=_host,
+        )
+    return es_instance
+
+def get_args():
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument("-f", "--file-path", default=None, type=str, help="")
+    parser.add_argument("-i", "--index", default=None, type=str, help="")
+    args = parser.parse_args()
+    return args.file_path, args.index
+
+def main():
+    try:
+        with open("./conf/config.json") as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        config = {}
+    file_path, indice = get_args()
+    with open(file_path) as fp:
+        file = json.load(fp)
+    export_file_into_elastic(file, indice, config)
+
+
+if __name__ == "__main__":
+    main()
+```
+This script requires a configuration file in a subdirectory `"./conf/config.json"` that specifies the elasticsearch connection parameters, but it can be omitted if you use a local elasticsearch without security. It takes two arguments : `-f` to specify the file to bulk from, in our case `carte_judiciaire.geojson`, and `-i` to specify the index to load into, in our case `carte_judiciaire2`.
+</details>
+
+Once again, creating a map layer is a good way to test out the results.
 
 # **Exam Objectives**
 ## Data Management
