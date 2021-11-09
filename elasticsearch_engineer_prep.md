@@ -15,10 +15,18 @@ Sincere thanks to Guido Lena Cota for
 [his excellent article](https://medium.com/kreuzwerker-gmbh/exercises-for-the-elastic-certified-engineer-exam-store-data-into-elasticsearch-cbce230bcc6)
 whose exercises are included almost as-is, and was a major inspiration for the present document.
 
-# <a id="practical_guide">Practical Guide</a>
+# <a id="practical_guide"></a>Practical Guide
 
 REQUIRED SETUP:
  - create an indice `hamlet-raw`
+
+<details>
+  <summary>Create hamlet-raw</summary>
+
+```
+PUT halmet-raw
+```
+</details>
 
 ## Add a document to `hamlet-raw`, so that the document (i) has id "1", (ii) has default type, (iii) has one field named `line` with value "To be, or not to be: that is the question"
 <details>
@@ -372,6 +380,49 @@ This script requires a configuration file in a subdirectory `"./conf/config.json
 
 Once again, creating a map layer is a good way to test out the results.
 
+## Changing an index's _dynamic_ settings
+
+### Set the number of replicas of the index `hamlet` to 0
+There are many reasons why you would want to do this : maybe the index is not used much anymore and availability is not as huge a concern anymore, maybe you're about to do a (chain of) big operation(s) and replicating those makes little sense, etc...
+You probably want to check out [the related documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/indices-update-settings.html)
+
+<details>
+    <summary>Solution</summary>
+
+```json
+PUT hamlet/_settings
+{
+  "number_of_replicas": 0
+}
+```
+</details>
+
+### Make the `lorem-ipsum` index read-only
+REQUIRED SETUP:
+ - an existing index in the cluster named `lorem-ipsum`
+
+<details>
+    <summary>Solution</summary>
+
+```json
+  PUT lorem-ipsum/_settings
+  {
+    "index.blocks.write": false
+  }
+```
+</details>
+
+There is also a [dedicated endpoint](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/index-modules-blocks.html) for `blocks` operation !
+
+<details>
+    <summary>Using _block</summary>
+
+```
+PUT /lorem-ipsum/_block/write
+```
+</details>
+
+
 # **Exam Objectives**
 ## Data Management
 ### <a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a>
@@ -449,11 +500,12 @@ PUT multitype
 }
 ```
 </details>
-
-#### 
-[TODO]: # (TODO)
   
 ### Use the Data Visualizer to upload a text file into Elasticsearch
+
+[TODO]: # (ajouter example)
+[Documentation](https://www.elastic.co/guide/en/machine-learning/7.15/ml-gs-visualizer.html)
+
 ### <a id="index_template">Define and use an index template for a given pattern that satisfies a given set of requirements</a>
 REQUIRED SETUP:
  - a running Elasticsearch cluster with at least one node and a Kibana instance,
@@ -579,6 +631,8 @@ PUT _index_template/hamlet_template
 ```
 </details>
 
+### Define and use a dynamic template that satisfies a given set of requirements
+
 #### Update `hamlet_template` so as to (i) allow dynamic mapping again, (ii) dynamically map to an integer any field that starts by "number_" and (iii) dynamically map to unanalysed text any string field & create the index `hamlet-2` and add a document by running the following command
 
 <details>
@@ -643,15 +697,18 @@ PUT _index_template/hamlet_template
     }
   }
 }
-
 ```
 </details>
 
 Now inspect the newly created index's mapping to assert the mapping follows the template's.
 
-### Define and use a dynamic template that satisfies a given set of requirements
 ### Define an Index Lifecycle Management policy for a time-series index
+
+[TODO]: # (TODO)
+
 ### Define an index template that creates a new data stream
+
+[TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/7.15/set-up-a-data-stream.html)
 
 ## <a id="searching_data">Searching Data</a>
 REQUIRED SETUP:
