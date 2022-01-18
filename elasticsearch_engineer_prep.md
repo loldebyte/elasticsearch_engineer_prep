@@ -15,6 +15,22 @@ Sincere thanks to Guido Lena Cota for
 [his excellent article](https://medium.com/kreuzwerker-gmbh/exercises-for-the-elastic-certified-engineer-exam-store-data-into-elasticsearch-cbce230bcc6)
 whose exercises are included almost as-is, and was a major inspiration for the present document.
 
+# Table of Contents
+
+## [Practical Guide](#practical_guide)
+
+## Exam exercises
+
+### [Data Management](#data_management)
+
+### [Searching Data](#searching_data)
+
+### [Developing Search Applications](#search_application)
+
+### [Data Processing](#data_processing)
+
+### [Cluster Management](#cluster_management)
+
 # <a id="practical_guide"></a>Practical Guide
 
 REQUIRED SETUP:
@@ -424,7 +440,7 @@ PUT /lorem-ipsum/_block/write
 
 
 # **Exam Objectives**
-## Data Management
+## <a id="data_management">Data Management</a>
 ### <a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a>
 <details>
     <summary>Defining an index:</summary>
@@ -702,23 +718,26 @@ PUT _index_template/hamlet_template
 
 Now inspect the newly created index's mapping to assert the mapping follows the template's.
 
-### Define an Index Lifecycle Management policy for a time-series index
-
-[TODO]: # (TODO)
 
 ### Define an index template that creates a new data stream
 
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/7.15/set-up-a-data-stream.html)
 
+### Define an Index Lifecycle Management policy for a time-series index
+
+[TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-index-lifecycle-management.html)
+using a data stream & an index template
+
 ## <a id="searching_data">Searching Data</a>
 REQUIRED SETUP:
  - the cluster has an index with name `multitype`
  - the `multitype` index's mapping matches the one from the [index creation](#create_index_with_settings) section
+
 ### Write and execute a search query for terms and/or phrases in one or more fields of an index
 [Search your Data](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/search-your-data.html)
 
-#### Exact search on a string field
-First, lets search for all documents containing `"composition"` in their `french` field.
+#### Simple search on a string field
+Lets search for all documents containing `"composition"` in their `french` field.
 
 <details>
     <summary>Solution</summary>
@@ -735,13 +754,66 @@ GET multitype/_search
 ```
 </details>
 
-#### 
+#### Exact search on a string field
+
+
 
 #### Simple search on multiple fields
 
 [Disjunction max](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-dis-max-query.html) aka `dis_max`.
 
-[TODO]: # (TODO)
+We'll start by searching for documents containing "Beethoven" or matching the following ip : 127.0.0.0/31.
+<details>
+    <summary>Solution</summary>
+
+```json
+GET multitype/_search
+{
+  "query": {
+    "dis_max": {
+      "queries": [
+        {"match": {
+          "phrase": "Beethoven"
+        }},
+        {
+          "match": {
+            "ip": "127.0.0.0/31"
+          }
+        }
+        ]
+    }
+  }
+}
+```
+</details>
+
+Now, we'll search only for documents matching both these queries.
+<details>
+    <summary>Solution</summary>
+
+```json
+GET multitype/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "phrase": "Beethoven"
+        }},
+        {
+          "match": {
+            "ip": "127.0.0.0/31"
+          }
+        }
+      ]
+    }
+  }
+}
+
+```
+</details>
+
+[Multi-match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html)
 
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
 ### Write an asynchronous search
@@ -749,7 +821,7 @@ GET multitype/_search
 ### Write and execute aggregations that contain sub-aggregations
 ### Write and execute a query that searches across multiple clusters
 
-## Developing Search Applications
+## <a id="search_application">Developing Search Applications</a>
 ### Highlight the search terms in the response of a query
 ### Sort the results of a query by a given set of requirements
 ### Implement pagination of the results of a search query
@@ -859,7 +931,7 @@ POST hamlet/_doc/8
 
 ### Define and use a search template
 
-## Data Processing
+## <a id="data_processing">Data Processing</a>
 ### Define a mapping that satisfies a given set of requirements
 ### Define and use a custom analyzer that satisfies a given set of requirements
 ### Define and use multi-fields with different data types and/or analyzers
@@ -992,7 +1064,7 @@ POST hamlet/_update_by_query?conflicts=proceed
 ### Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents
 ### Configure an index so that it properly maintains the relationships of nested arrays of objects
 
-## Cluster Management
+## <a id="cluster_management">Cluster Management</a>
 ### Diagnose shard issues and repair a cluster's health
 ### Backup and restore a cluster and/or specific indices
 ### Configure a snapshot to be searchable
