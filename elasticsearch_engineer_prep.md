@@ -813,7 +813,62 @@ GET multitype/_search
 ```
 </details>
 
-[Multi-match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html)
+Before the next step, we will add a couple documents to our index :
+<details>
+    <summary>Execute before continuing</summary>
+
+```json
+POST _bulk
+{"index":{"_index":"multitype"}}
+{"id": "Beethoven", "phrase": "Lorem ipsum"}
+{"index":{"_index":"multitype"}}
+{"phrase": "Beethoven est génial", "id": "Beethoven"}
+```
+</details>
+
+
+Now, we will search for documents containing `"Beethoven"` in either the `french` or the `id` fields.
+<details>
+    <summary>Solutions</summary>
+
+Using [Multi-match](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html)
+```json
+GET multitype/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Beethoven",
+      "fields": ["id", "french"]
+    }
+  }
+}
+```
+</details>
+
+<details>
+    <summary>Solution</summary>
+
+Using [bool](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html)
+```json
+GET multitype/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {"match": {
+          "id": "Beethoven"
+        }},
+        {"match": {
+          "french": "Beethoven"
+        }}
+      ]
+    }
+  }
+}
+```
+</details>
+
+
 
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
 ### Write an asynchronous search
