@@ -871,10 +871,31 @@ GET multitype/_search
 
 
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
+
+
 ### Write an asynchronous search
+
+[documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/async-search.html)
+
+<details>
+    <summary>Solution</summary>
+
+You simply need to change the endpoint, as such :
+
+```json
+POST multitype/_async_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+```
+</details>
+
 ### Write and execute metric and bucket aggregations
 ### Write and execute aggregations that contain sub-aggregations
 ### Write and execute a query that searches across multiple clusters
+
 
 ## <a id="search_application">Developing Search Applications</a>
 ### Highlight the search terms in the response of a query
