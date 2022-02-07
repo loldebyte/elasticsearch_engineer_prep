@@ -871,7 +871,68 @@ GET multitype/_search
 
 
 ### Write and execute a search query that is a Boolean combination of multiple queries and filters
+REQUIRED SETUP:
+ - the cluster has no index names `notes`
+ - run the following query to index documents in index `notes`.
 
+
+<details>
+    <summary>Bulk into notes</summary>
+
+```json
+POST notes/_bulk
+{"index":{"_index":"notes"}}
+{"matière": "Maths", "note": 14, "id": "35"}
+{"index":{"_index":"notes"}}
+{"matière": "Maths", "note": 13, "id": "14"}
+{"index":{"_index":"notes"}}
+{"matière": "Maths", "note": 17, "id": "7"}
+{"index":{"_index":"notes"}}
+{"matière": "Français", "note": 12, "id": "34"}
+{"index":{"_index":"notes"}}
+{"matière": "Français", "note": 9, "id": "35"}
+{"index":{"_index":"notes"}}
+{"matière": "Français", "note": 17, "id": "9"}
+{"index":{"_index":"notes"}}
+{"matière": "Maths", "note": 18, "id": "4"}
+{"index":{"_index":"notes"}}
+{"matière": "Maths", "note": 18, "id": "4"}
+```
+</details>
+
+Now we'll try to search for whatever documents that scored above 15, and rank Maths notes higher because they have a bigger weight.
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "range": {
+            "note": {
+              "gte": 15
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "term": {
+            "matière.keyword": {
+              "value": "Maths"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+</details>
 
 ### Write an asynchronous search
 
@@ -893,9 +954,141 @@ POST multitype/_async_search
 </details>
 
 ### Write and execute metric and bucket aggregations
-### Write and execute aggregations that contain sub-aggregations
-### Write and execute a query that searches across multiple clusters
+REQUIRED SETUP:
+ - the cluster has an index named `notes` that matches the one required for the boolean exercise
 
+[terms aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html)
+[average aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-avg-aggregation.html)
+
+Now, let's suppose we want to know the average grade. How'd you do that ?
+
+<details>
+    <summary>Result</summary>
+
+If you have indexed no extra document, you should have 14.5.
+</details>
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "size": 0, 
+  "aggs": {
+    "NAME": {
+      "avg": {
+        "field": "note"
+      }
+    }
+  }
+}
+```
+</details>
+
+Now, we want to know the average grade in maths only.
+
+<details>
+    <summary>Result</summary>
+
+If you have indexed no extra document, you should have 15.5 this time !
+</details>
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "query": {
+    "match": {
+      "matière.keyword": "Maths"
+    }
+  }, 
+  "size": 0, 
+  "aggs": {
+    "NAME": {
+      "avg": {
+        "field": "note"
+      }
+    }
+  }
+}
+
+```
+</details>
+
+Finally, we want to know how many grades we have for each subject (matière).
+
+<details>
+    <summary>Result</summary>
+
+We have 4 grades for "Maths", 3 for "Français and one for "Anglais.
+</details>
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "aggs": {
+    "NAME": {
+      "terms": {
+        "field": "matière.keyword",
+        "size": 10
+      }
+    }
+  }
+}
+
+```
+</details>
+
+### Write and execute aggregations that contain sub-aggregations
+REQUIRED SETUP:
+ - the cluster has an index named `notes` that matches the one required for the boolean exercise
+
+[sub-aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#run-sub-aggs)
+Now, we want to now the average grade for each subject in a single query.
+
+<details>
+    <summary>Result</summary>
+
+If you have indexed no extra documents, your averages should be : 15.5 for Maths, 12.6 for Français & 18 for Anglais.
+</details>
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "size": 0, 
+  "aggs": {
+    "subjects": {
+      "terms": {
+        "field": "matière.keyword",
+        "size": 10
+      },
+      "aggs": {
+        "subject_avg": {
+          "avg": {
+            "field": "note"
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+</details>
+
+### Write and execute a query that searches across multiple clusters
+REQUIRED SETUP:
+ - WIP
+
+ [cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html)
 
 ## <a id="search_application">Developing Search Applications</a>
 ### Highlight the search terms in the response of a query
