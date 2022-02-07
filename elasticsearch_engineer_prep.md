@@ -550,7 +550,7 @@ Note that `"index_pattern"` here refers to a pattern matching indices, not a kib
 
 You should be able to create indices and check their configuration by now, if not, check the [practical guide](#practical_guide)
 
-#### Update `hamlet_template` by defining a mapping for the type "_doc", so that (i) the type has three fields, named `speaker, `line_number`, and `text_entry`, (ii) `text_entry` uses an "english" analyzer
+#### Update `hamlet_template` by defining a mapping for the type "_doc", so that (i) the type has three fields, named `speaker`, `line_number`, and `text_entry`, (ii) `text_entry` uses an "english" analyzer
 
 <details>
     <summary>Solution</summary>
@@ -965,7 +965,7 @@ Now, let's suppose we want to know the average grade. How'd you do that ?
 <details>
     <summary>Result</summary>
 
-If you have indexed no extra document, you should have 14.5.
+If you have indexed no extra document, you should have 15.
 </details>
 
 <details>
@@ -991,7 +991,7 @@ Now, we want to know the average grade in maths only.
 <details>
     <summary>Result</summary>
 
-If you have indexed no extra document, you should have 15.5 this time !
+If you have indexed no extra document, you should have 16 this time !
 </details>
 <details>
     <summary>Solution</summary>
@@ -1022,7 +1022,7 @@ Finally, we want to know how many grades we have for each subject (matière).
 <details>
     <summary>Result</summary>
 
-We have 4 grades for "Maths", 3 for "Français and one for "Anglais.
+We have 5 grades for "Maths" and 3 for "Français.
 </details>
 
 <details>
