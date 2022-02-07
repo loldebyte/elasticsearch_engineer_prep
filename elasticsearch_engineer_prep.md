@@ -1049,6 +1049,7 @@ REQUIRED SETUP:
  - the cluster has an index named `notes` that matches the one required for the boolean exercise
 
 [sub-aggregations](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#run-sub-aggs)
+
 Now, we want to now the average grade for each subject in a single query.
 
 <details>
@@ -1088,11 +1089,68 @@ GET notes/_search
 REQUIRED SETUP:
  - WIP
 
- [cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html)
+[cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html)
 
 ## <a id="search_application">Developing Search Applications</a>
 ### Highlight the search terms in the response of a query
+REQUIRED SETUP:
+ - an index named `multitype` with previously indexed documents exists in the cluster
+
+[Highlighting](https://www.elastic.co/guide/en/elasticsearch/reference/current/highlighting.html)
+
+Let's search for `Beethoven` in the `french` field, and highlight the results.
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET multitype/_search
+{
+  "query": {
+    "match": {
+      "french": "Beethoven"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "french": {}
+    }
+  }
+}
+```
+</details>
+
+
 ### Sort the results of a query by a given set of requirements
+REQUIRED SETUP:
+ - the index `notes` created in the boolean exercise
+
+[sort search results](https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-search-results.html)
+
+Let's search for every document in the `notes` index, but sort these by note without using `_score`s at all.
+
+<details>
+    <summary>Solution</summary>
+
+```json
+GET notes/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "note": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+```
+</details>
+As seen in the documentation, sorts can be much, much more complex than this.
+
 ### Implement pagination of the results of a search query
 ### Define and use index aliases
 REQUIRED SETUP:
