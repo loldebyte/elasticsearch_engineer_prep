@@ -723,10 +723,127 @@ Now inspect the newly created index's mapping to assert the mapping follows the 
 
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/7.15/set-up-a-data-stream.html)
 
+#### Create an Index Lifecycle Policy named `five-minute-lifetime` that satisfies a given set of requirements
+Your ILP must :
+- rollover to warm phase after 30 seconds
+- rollover to cold phase after 2 minutes
+- delete 5 minutes old data
+
+You can use the UI or the `_ilm/policy` endpoint. If you use the UI, check your request using the `Show request` button on the bottom right.
+<details>
+    <summary>your ILP request should match this</summary>
+
+```json
+PUT _ilm/policy/five-minute-lifetime
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "0ms",
+        "actions": {
+          "set_priority": {
+            "priority": 100
+          },
+          "rollover": {
+            "max_primary_shard_size": "50gb",
+            "max_age": "30s"
+          }
+        }
+      },
+      "warm": {
+        "min_age": "30s",
+        "actions": {
+          "set_priority": {
+            "priority": 50
+          },
+          "allocate": {
+            "number_of_replicas": 0
+          }
+        }
+      },
+      "cold": {
+        "min_age": "2m",
+        "actions": {
+          "set_priority": {
+            "priority": 0
+          },
+          "allocate": {
+            "number_of_replicas": 0
+          }
+        }
+      },
+      "delete": {
+        "min_age": "5m",
+        "actions": {
+          "delete": {
+            "delete_searchable_snapshot": true
+          }
+        }
+      }
+    }
+  }
+}
+```
+</details>
+
+#### Create an Index Template `five-minute-lifetime` for a Data Stream
+Your Index Template must :
+- affect indexes `five-min`, `five-mins`, `five-minutes` & `five-minute`
+- specify the alias `five-minute-lifetime-hot` as write index.
+
+If you use the UI, check the `Request` panel once in the 6th step `Review template`.
+
+<details>
+    <summary>your request should match this</summary>
+
+```json
+PUT _index_template/five-minute-lifetime
+{
+  "template": {
+    "aliases": {
+      "five-minute-lifetime-hot": {
+        "is_write_index": true
+      }
+    }
+  },
+  "index_patterns": [
+    "five-min",
+    "five-mins",
+    "five-minute",
+    "five-minutes"
+  ],
+  "data_stream": {
+    "hidden": false
+  },
+  "composed_of": []
+}
+```
+</details>
+
+Don't forget to add the policy to your new index template from the `Index Lifecycle Policy` menu !!
+
+#### Check that the data stream is working as indended
+A Data stream must specify a `@timestamp` field that can be parsed into a date.
+
+Try indexing documents into anyone of the `five-min` indices.
+<details>
+    <summary>Example</summary>
+
+```json
+POST five-minute/_doc
+{
+  "@timestamp": "2022-02-22"
+}
+```
+</details>
+
+
+
 ### Define an Index Lifecycle Management policy for a time-series index
 
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-index-lifecycle-management.html)
 using a data stream & an index template
+
 
 ## <a id="searching_data">Searching Data</a>
 REQUIRED SETUP:
