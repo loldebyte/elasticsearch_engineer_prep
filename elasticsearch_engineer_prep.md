@@ -719,7 +719,7 @@ PUT _index_template/hamlet_template
 Now inspect the newly created index's mapping to assert the mapping follows the template's.
 
 
-### Define an index template that creates a new data stream
+### Define an index template that creates a new data stream for a time-series index
 
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/7.15/set-up-a-data-stream.html)
 
@@ -837,6 +837,7 @@ POST five-minute/_doc
 ```
 </details>
 
+Now, use `GET .ds-five-min*/_ilm/explain` to check how your ILM is doing after 30s, 2m & 5m.
 
 
 ### Define an Index Lifecycle Management policy for a time-series index
