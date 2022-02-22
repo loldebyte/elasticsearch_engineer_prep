@@ -1445,8 +1445,90 @@ PUT _scripts/notes_template
 
 ## <a id="data_processing">Data Processing</a>
 ### Define a mapping that satisfies a given set of requirements
+
+#### Create the index `multitype` with (i) a `geoloc` field of type `geo_point` (ii) an `id` field of type `keyword` (iii) a field `phrase` of type `text` with the analyzer `french` (iv) a field `ip` of type `ip` and (v) an alias field to `phrase` named `french`.
+
+If you wonder about any of these types, see [mapping types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html)
+
+<details>
+    <summary>Solution</summary>
+
+```json
+PUT multitype
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "geoloc": {
+        "type": "geo_point"
+      },
+      "id": {
+        "type": "keyword"
+      },
+      "phrase": {
+        "type": "text",
+        "analyzer": "french"
+      },
+      "ip": {
+        "type": "ip"
+      },
+      "french": {
+        "type": "alias",
+        "path": "phrase"
+      }
+    }
+  }
+}
+```
+</details>
+  
+
+
 ### Define and use a custom analyzer that satisfies a given set of requirements
+
+
 ### Define and use multi-fields with different data types and/or analyzers
+Create an indice whose mapping satifies the following conditions :
+- the indice has only one field `text` of type `keyword`
+- the `text` field has a subfield `french` of type `text` that uses the `french` analyzer
+- the `text` field has a subfield `english` of type `text` that uses the `english` analyzer
+- the `text` field has a subfield `numeric` of type `long` that ignores invalid values
+
+You will need to use several [mapping parameters](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping-params.html).
+
+<details>
+    <summary>Indice creation request</summary>
+
+```json
+PUT multifield
+{
+  "mappings": {
+    "properties": {
+      "text": {
+        "type": "keyword",
+        "fields": {
+          "english": {
+            "type": "text",
+            "analyzer": "english"
+          },
+          "french": {
+            "type": "text",
+            "analyzer": "french"
+          },
+          "numeric": {
+            "type": "long",
+            "ignore_malformed": true
+          }
+        }
+      }
+    }
+  }
+}
+```
+</details>
+
+
+
 ### Use the Reindex API and Update By Query API to reindex and/or update documents
 #### Update the document with id "1" by adding a field named `line_number` with value "3.1.64"
 <details>
