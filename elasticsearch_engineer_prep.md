@@ -1270,6 +1270,9 @@ GET notes/_search
 As seen in the documentation, sorts can be much, much more complex than this.
 
 ### Implement pagination of the results of a search query
+
+[Search query pagination](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/paginate-search-results.html)
+
 ### Define and use index aliases
 REQUIRED SETUP:
  - a running Elasticsearch cluster with at least one node and a Kibana instance,
@@ -1375,6 +1378,70 @@ POST hamlet/_doc/8
 
 
 ### Define and use a search template
+
+[Search template](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/search-template.html)
+
+Create a `bool` search template with parametrized :
+- what the field `matière` is matched against
+- the lower limit the `note` field is matched against
+- the upper limit the `note` field is matched against
+
+Now try to use your saved search to retrieve documents that correspond to `Maths` notes above `15`.
+<details>
+    <summary>To test your saved search</summary>
+
+```json
+GET notes/_search/template
+{
+  "id": "notes_template",
+  "params": {
+    "matière": "Maths",
+    "gte": 15,
+    "lte": 22
+  }
+}
+```
+
+This should yield 3 documents, two with a note of 18 and one with a note of 17.
+</details>
+
+<details>
+    <summary>Solution to create the search template</summary>
+
+```json
+PUT _scripts/notes_template
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "must": [
+            {"match": {
+              "matière": "{{matière}}"
+            }},
+            {"range": {
+              "note": {
+                "gte": "{{gte}}",
+                "lte": "{{lte}}"
+            }
+          }
+        }
+      ]
+    }
+    }
+    },
+    "params": {
+      "matière": "",
+      "gte": 10
+    }
+  }
+}
+```
+</details>
+
+
+
 
 ## <a id="data_processing">Data Processing</a>
 ### Define a mapping that satisfies a given set of requirements
