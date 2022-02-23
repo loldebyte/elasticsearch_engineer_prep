@@ -826,6 +826,7 @@ Don't forget to add the policy to your new index template from the `Index Lifecy
 A Data stream must specify a `@timestamp` field that can be parsed into a date.
 
 Try indexing documents into anyone of the `five-min` indices.
+
 <details>
     <summary>Example</summary>
 
@@ -1487,6 +1488,7 @@ PUT multitype
 ### Define and use a custom analyzer that satisfies a given set of requirements
 
 
+
 ### Define and use multi-fields with different data types and/or analyzers
 Create an indice whose mapping satifies the following conditions :
 - the indice has only one field `text` of type `keyword`
@@ -1693,6 +1695,112 @@ POST hamlet/_update_by_query?conflicts=proceed
 
 ### Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents
 ### Configure an index so that it properly maintains the relationships of nested arrays of objects
+REQUIRED SETUP:
+- No existing indice named `obj`
+
+Execute the following query to index a document into `obj` :
+
+<details>
+    <summary>index into obj</summary>
+
+```json
+POST obj/_doc
+{
+  "object": [
+    {
+      "nom": "table",
+      "id": 24
+    },
+    {
+      "nom": "truc",
+      "id": 5
+    }]
+}
+
+```
+</details>
+
+Before going on, check the indice's mapping. Notice the type of `object`.
+
+To understand what's wrong with it, let's try a query that shouldn't work : try a boolean query that matches `object.nom` against `table` _and_ `truc`.
+
+<details>
+    <summary>Query</summary>
+
+```json
+GET obj/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "object.nom": "table"
+        }},
+        {
+          "match": {
+            "object.nom": "truc"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+</details>
+
+To solve the issue, we need to change the [mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html).
+
+Delete `obj`, re-create it with the proper mapping and re-index our document.
+
+<details>
+    <summary>working mapping</summary>
+
+```json
+PUT obj
+{
+  "mappings": {
+    "properties": {
+      "object": {
+        "type": "nested"
+      }
+    }
+  }
+}
+```
+</details>
+
+Now, try to come up with a query that fails when it should, but also works when it should !
+
+<details>
+    <summary>Working query</summary>
+
+```json
+GET obj/_search
+{
+  "query": {
+    "nested": {
+      "path": "object",
+      "query": {
+        "bool": {
+          "must": [
+            {"match": {
+              "object.nom": "table"
+            }},
+            {
+              "match": {
+                "object.id": 5
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+```
+</details>
+
+
 
 ## <a id="cluster_management">Cluster Management</a>
 ### Diagnose shard issues and repair a cluster's health
