@@ -1496,8 +1496,44 @@ Create an indice whose mapping satifies the following conditions :
 
 You will need to use several [mapping parameters](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping-params.html).
 
+To test if your indice works, try to index a document with a `text` value of `2`, another with a `text` value of `Le petit renard gris rapide` and a last one with a `text` value of `The quick small grey fox`.
+
 <details>
-    <summary>Indice creation request</summary>
+    <summary>Index docs</summary>
+
+```json
+POST _bulk
+{"index": {"_index": "multifield"}}
+{"text": 2}
+{"index": {"_index": "multifield"}}
+{"text": "Le petit renard gris rapide"}
+{"index": {"_index": "multifield"}}
+{"text": "The small quick grey fox"}
+
+```
+</details>
+
+Now, we will execute multiple queries against our indice to test it out :
+- query for indices with a value of `2` and `"2"` respectively against all (sub)fields, one at a time
+- query for indices with a value of `Le` in the `text.french` and `text.english` fields
+- query for indices with a value of `The` in the `text.french` and `text.english` fields
+- query for indices with a value of `quick` and `rapide` in the `text`, `text.french` and `text.english` fields
+
+<details>
+    <summary>Expected query results</summary>
+
+Match queries against `"2"` or `2` should all match a single document with a `_source.text` value of `2`.
+
+Match queries against `Le` should match the document with a `_source.text` value of `Le petit renard gris rapide` only when matched against `text.english`.
+
+Match queries against `The` should match the document with a `_source.text` value of `The quick small grey fox` only when matched against `text.french`.
+
+Match queries against `quick` and `rapide` should match the documents with a `_source.text` value of `The quick small grey fox` and `Le petit renard gris rapide` respectively regardless of the field matched against.
+</details>
+
+
+<details>
+    <summary>Solution</summary>
 
 ```json
 PUT multifield
