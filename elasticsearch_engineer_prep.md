@@ -1486,7 +1486,69 @@ PUT multitype
 
 
 ### Define and use a custom analyzer that satisfies a given set of requirements
+REQUIRED SETUP :
+- no existing indice named `custom_ngram`
 
+Create create and indice `custom_ngram` with a default analyzer that satisfies the following conditions :
+- tokenizes on whitespaces
+- lowercases all characters
+- filters out Lucene's french stopwords
+- retrieves n-grams of length 3-4 (eg 'nope' becomes 'nop', 'nope', 'ope')
+
+<details>
+    <summary>Solution</summary>
+
+```json
+PUT custom_ngram
+{
+  "settings": {
+    "index": {
+      "max_ngram_diff": 2
+    },
+    "analysis": {
+      "analyzer": {
+        "default": {
+          "tokenizer": "whitespace",
+          "filter": [ "lowercase", "stop_french", "3_4_gram" ]
+        }
+      },
+      "filter": {
+        "3_4_gram": {
+          "type": "ngram",
+          "min_gram": 3,
+          "max_gram": 4
+        },
+        "stop_french": {
+          "type": "stop",
+          "stopwords": "_french_"
+        }
+      }
+    }
+  }
+}
+```
+</details>
+
+To test out your work, index the following document :
+
+<details>
+    <summary>Query to index</summary>
+
+```json
+POST custom_ngram/_doc
+{
+  "text": "Elle aime son joli renard gris "
+}
+```
+</details>
+
+Si votre indice est correctement paramétré, les requêtes cherchant `Elle` ou `ell` ne matchent aucun document, alors que cells cherchant `gris` ou `connard` trouvent le document.
+
+<details>
+    <summary>Explication</summary>
+
+Le mot `Elle` est inclus dans les stopwords, donc il est exclu avant de passer dans le filtre `3_4_ngram`. Parmi les ngrams générés par le mot `connard` on a `nard` et `ard`, qui matchent les ngrams générés par `renard` et donc matchent notre document.
+</details>
 
 
 ### Define and use multi-fields with different data types and/or analyzers
