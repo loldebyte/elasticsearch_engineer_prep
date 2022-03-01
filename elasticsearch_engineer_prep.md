@@ -10,7 +10,7 @@ This [webinar](https://www.youtube.com/watch?v=9UpB-s_ZfNE) for details about th
 
 [This article](https://www.linkedin.com/pulse/elastic-certified-engineer-exam-my-experience-how-i-surbhi-mahajan) for its concrete experience and recommendations.
 
-The official [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/elasticsearch-intro.html). Accustomation with the documentation is crucial.
+The official [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/elasticsearch-intro.html). Accustomation to the documentation is crucial.
 
 # Credits
 
@@ -449,6 +449,8 @@ PUT /lorem-ipsum/_block/write
 ## <u><a id="data_management">Data Management</a></u>
 
 ### <u><a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a></u>
+
+For a list of options, see [index modules](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html)
 
 <details>
     <summary>Defining an index:</summary>
@@ -1780,6 +1782,8 @@ POST hamlet/_update_by_query?conflicts=proceed
 
 ### <u>Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents</u>
 
+#### Define and use an ingest pipeline that consists of a single processor
+
 REQUIRED SETUP:
 - no existing index named `dissected` in cluster
 - no existing ingest pipeline named `postgresql_logs_pipeline` in cluster
@@ -1843,6 +1847,28 @@ POST _ingest/pipeline/postgresql_logs_pipeline/_simulate
 The simulation works if there is no error & if you can see our 4 fields in the response's `_source`.
 </details>
 
+If you have trouble figuring this out, you probably want to check [how to create an index with custom settings](#create_index_with_settings) again !
+
+**<u>BONUS EXERCISE :</u>**
+
+Same exercise **but** your `dissected` indice must have a field `@timestamp` of type `date` and **must** correctly parse it !
+
+<details>
+    <summary>Indice creation</summary>
+
+```json
+PUT dissected
+{
+  "settings": {
+    "index.default_pipeline": "postgresql_logs_pipeline",
+    "number_of_replicas": 0
+  }
+}
+```
+</details>
+
+For the solution to the bonus exercise, you'll have to wait until the next exercise !
+
 You should know how to execute a bulk request from a file if you followed the [practical guide](#practical_guide) attentively enough !
 
 <details>
@@ -1852,6 +1878,139 @@ You should know how to execute a bulk request from a file if you followed the [p
 curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @bulk_postgre_logs
 ```
 </details>
+
+#### Define and use an ingest pipeline that uses Painless
+
+REQUIRED SETUP:
+- no indice named `dissected` in cluster
+- no ingest pipeline named `my-scripted-pipeline` in cluster
+
+The goal of this exercise is to learn how to use painless scripting to modify documents and <u>MOST IMPORTANTLY</u> to let you know where to look for painless documentation.
+
+The name of the kibana's scripting language (painless) will at first feel very sarcastic to you if you are not accustomed to java.
+
+We will use the same bulk request located at `./course_material/bulk_postgre_logs`. The goal is to extract the date using painless.
+
+You must do the following :
+- Create an ingest pipeline `my-scripted-pipeline` that uses painless to extract the datetime
+- Simulate your pipeline to ensure it works as intended
+- Create the `dissected` indice with an `@timestamp` field of type `date` and assign it `my-scripted-pipeline` as default ingest pipeline.
+- Execute the bulk request
+
+I could not recommend enough using kibana's [painless lab](https://www.elastic.co/guide/en/kibana/7.17/painlesslab.html) to help with debugging the painless script.
+
+The processor we will use is the [script processor](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/script-processor.html).
+
+For datetimes in painless, see [this](https://www.elastic.co/guide/en/elasticsearch/painless/7.17/painless-api-reference-shared.html#_java_time) documentation page. Yes, you will need to browse the java documentation.
+
+<details>
+    <summary>Simulation query to test out your pipeline</summary>
+
+```json
+POST _ingest/pipeline/my-scripted-pipeline/_simulate
+{
+  "docs": [
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.119 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}}
+    ]
+}
+```
+</details>
+
+<details>
+    <summary>I'm stuck : how do I slice strings in painless ?</summary>
+
+Painless works just like java in that regard.
+```python
+string[:42]
+```
+is the python equivalent to :
+```java
+string.substring(0, 42)
+```
+</details>
+
+<details>
+    <summary>I'm stuck : how do I parse dates in painless ?</summary>
+
+Painless works like java there too, take a look at [this](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html)
+</details>
+
+<details>
+    <summary>I give up, give me the query that create the pipeline...</summary>
+
+```json
+PUT _ingest/pipeline/my-scripted-pipeline
+{
+  "description": "",
+  "processors": [
+    {"script": {
+      "lang": "painless",
+      "source": """
+      String s = ctx.log.substring(0, 27);
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern('uuuu-MM-dd HH:mm:ss.SSS zzz');
+      ZonedDateTime dt = ZonedDateTime.parse(s, formatter);
+      ctx['@timestamp'] = dt.getLong(ChronoField.INSTANT_SECONDS)*1000L;
+      """
+    }}
+  ]
+}
+```
+[This](https://www.elastic.co/guide/en/elasticsearch/painless/8.0/painless-ingest-processor-context.html) documentation page provided almost everything you needed !
+</details>
+
+<details>
+    <summary>Simulation query</summary>
+
+Same as last exercise, working if `_source` contains an `@timestamp` field with an EPOCH millis corresponding to `Monday 21 February 2022 08:31:00`.
+```json
+POST _ingest/pipeline/my-scripted-pipeline/_simulate
+{
+  "docs": [
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.119 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}}
+    ]
+}
+```
+</details>
+
+You just executed a bulk request, so you have no excuse this time.
+
+Okay, fine, we use the exact same command anyway :
+<details>
+    <summary>Executing the bulk request</summary>
+
+```bash
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @bulk_postgre_logs
+```
+</details>
+
+<details>
+    <summary>Solution to the previous exercise's Bonus</summary>
+
+```json
+PUT dissected
+{
+  "settings": {
+    "index.default_pipeline": "postgresql_logs_pipeline",
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "@timestamp": {
+        "type": "date",
+        "format": "uuuu-MM-dd HH:mm:ss.SSS zzz"
+      }
+    }
+  }
+}
+```
+Elasticsearch is also built on java, so the same format that works in painless works natively, too !
+</details>
+
+If curl's response has a value of `false` for the field `errors`, then you're done, congratulations !
 
 ### <u>Configure an index so that it properly maintains the relationships of nested arrays of objects</u>
 
