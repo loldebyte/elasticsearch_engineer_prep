@@ -44,7 +44,9 @@ PUT halmet-raw
 ```
 </details>
 
-## Add a document to `hamlet-raw`, so that the document (i) has id "1", (ii) has default type, (iii) has one field named `line` with value "To be, or not to be: that is the question"
+## <u>Introductory Exercices</u>
+
+### Add a document to `hamlet-raw`, so that the document (i) has id "1", (ii) has default type, (iii) has one field named `line` with value "To be, or not to be: that is the question"
 <details>
     <summary>Solution</summary>
 
@@ -56,7 +58,7 @@ PUT hamlet-raw/_doc/1
 ```
 </details>
 
-## Add a new document to `hamlet-raw`, so that the document (i) has  the id automatically assigned by Elasticsearch, (ii) has  default type, (iii) has a field named `text_entry` with value "Whether tis nobler in the mind to suffer", (iv) has a field  named `line_number` with value "3.1.66"
+### Add a new document to `hamlet-raw`, so that the document (i) has  the id automatically assigned by Elasticsearch, (ii) has  default type, (iii) has a field named `text_entry` with value "Whether tis nobler in the mind to suffer", (iv) has a field  named `line_number` with value "3.1.66"
 
 <details>
     <summary>Solution</summary>
@@ -71,7 +73,7 @@ POST hamlet-raw/_doc
 ```
 </details>
 
-## Remove from `hamlet` the documents that have either `"KING CLAUDIUS"` or `"LAERTES"` as the value of `speaker`
+### Remove from `hamlet` the documents that have either `"KING CLAUDIUS"` or `"LAERTES"` as the value of `speaker`
 [Delete by Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/docs-delete-by-query.html)\
 [Boolean Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/query-dsl-bool-query.html) for "OR" searches\
 [Full text Query](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/full-text-queries.html)
@@ -96,7 +98,7 @@ POST hamlet/_delete_by_query
 ```
 </details>
 
-## Index a geoJSON without using kibana's UI
+## <u>Index a geoJSON without using kibana's UI</u>
 In this exercise, we will learn how to index a geojson file into elasticsearch with two methods :
  - Using `cURL`
  - Using python's `elasticsearch` package
@@ -396,7 +398,7 @@ This script requires a configuration file in a subdirectory `"./conf/config.json
 
 Once again, creating a map layer is a good way to test out the results.
 
-## Changing an index's _dynamic_ settings
+## <u>Changing an index's _dynamic_ settings</u>
 
 ### Set the number of replicas of the index `hamlet` to 0
 There are many reasons why you would want to do this : maybe the index is not used much anymore and availability is not as huge a concern anymore, maybe you're about to do a (chain of) big operation(s) and replicating those makes little sense, etc...
@@ -440,8 +442,11 @@ PUT /lorem-ipsum/_block/write
 
 
 # **Exam Objectives**
-## <a id="data_management">Data Management</a>
-### <a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a>
+
+## <u><a id="data_management">Data Management</a></u>
+
+### <u><a id="create_index_with_settings">Define an index that satisfies a given set of requirements</a></u>
+
 <details>
     <summary>Defining an index:</summary>
 
@@ -466,7 +471,7 @@ PUT <index_name>
 ```
 </details>
 
-#### Create the index `hamlet-raw` with 1 primary shard and 3 replicas
+#### <u>Create the index `hamlet-raw` with 1 primary shard and 3 replicas</u>
 <details>
     <summary>Solution</summary>
 
@@ -481,7 +486,7 @@ PUT hamlet-raw
 car `number_of_shards` vaut 1 par défaut.
 </details>
 
-#### Create the index `multitype` with (i) a `geoloc` field of type `geo_point` (ii) an `id` field of type `keyword` (iii) a field `phrase` of type `text` with the analyzer `french` (iv) a field `ip` of type `ip` and (v) an alias field to `phrase` named `french`.
+#### <u>Create the index `multitype` with (i) a `geoloc` field of type `geo_point` (ii) an `id` field of type `keyword` (iii) a field `phrase` of type `text` with the analyzer `french` (iv) a field `ip` of type `ip` and (v) an alias field to `phrase` named `french`.</u>
 
 If you wonder about any of these types, see [mapping types](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/mapping-types.html)
 
@@ -516,13 +521,14 @@ PUT multitype
 }
 ```
 </details>
-  
-### Use the Data Visualizer to upload a text file into Elasticsearch
+
+### <u>Use the Data Visualizer to upload a text file into Elasticsearch</u>
 
 [TODO]: # (ajouter example)
 [Documentation](https://www.elastic.co/guide/en/machine-learning/7.15/ml-gs-visualizer.html)
 
-### <a id="index_template">Define and use an index template for a given pattern that satisfies a given set of requirements</a>
+### <u><a id="index_template">Define and use an index template for a given pattern that satisfies a given set of requirements</a></u>
+
 REQUIRED SETUP:
  - a running Elasticsearch cluster with at least one node and a Kibana instance,
  - the cluster has no index with name `hamlet`, 
@@ -647,7 +653,7 @@ PUT _index_template/hamlet_template
 ```
 </details>
 
-### Define and use a dynamic template that satisfies a given set of requirements
+### <u>Define and use a dynamic template that satisfies a given set of requirements</u>
 
 #### Update `hamlet_template` so as to (i) allow dynamic mapping again, (ii) dynamically map to an integer any field that starts by "number_" and (iii) dynamically map to unanalysed text any string field & create the index `hamlet-2` and add a document by running the following command
 
@@ -719,7 +725,7 @@ PUT _index_template/hamlet_template
 Now inspect the newly created index's mapping to assert the mapping follows the template's.
 
 
-### Define an index template that creates a new data stream for a time-series index
+### <u>Define an index template that creates a new data stream for a time-series index</u>
 
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/7.15/set-up-a-data-stream.html)
 
@@ -846,13 +852,14 @@ Now, use `GET .ds-five-min*/_ilm/explain` to check how your ILM is doing after 3
 [TODO]: # (https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-index-lifecycle-management.html)
 using a data stream & an index template
 
+## <u><a id="searching_data">Searching Data</a></u>
 
-## <a id="searching_data">Searching Data</a>
 REQUIRED SETUP:
  - the cluster has an index with name `multitype`
  - the `multitype` index's mapping matches the one from the [index creation](#create_index_with_settings) section
 
-### Write and execute a search query for terms and/or phrases in one or more fields of an index
+### <u>Write and execute a search query for terms and/or phrases in one or more fields of an index</u>
+
 [Search your Data](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/search-your-data.html)
 
 #### Simple search on a string field
@@ -989,7 +996,8 @@ GET multitype/_search
 
 
 
-### Write and execute a search query that is a Boolean combination of multiple queries and filters
+### <u>Write and execute a search query that is a Boolean combination of multiple queries and filters</u>
+
 REQUIRED SETUP:
  - the cluster has no index names `notes`
  - run the following query to index documents in index `notes`.
@@ -1053,7 +1061,7 @@ GET notes/_search
 ```
 </details>
 
-### Write an asynchronous search
+### <u>Write an asynchronous search</u>
 
 [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/async-search.html)
 
@@ -1072,7 +1080,8 @@ POST multitype/_async_search
 ```
 </details>
 
-### Write and execute metric and bucket aggregations
+### <u>Write and execute metric and bucket aggregations</u>
+
 REQUIRED SETUP:
  - the cluster has an index named `notes` that matches the one required for the boolean exercise
 
@@ -1163,7 +1172,8 @@ GET notes/_search
 ```
 </details>
 
-### Write and execute aggregations that contain sub-aggregations
+### <u>Write and execute aggregations that contain sub-aggregations</u>
+
 REQUIRED SETUP:
  - the cluster has an index named `notes` that matches the one required for the boolean exercise
 
@@ -1204,14 +1214,17 @@ GET notes/_search
 ```
 </details>
 
-### Write and execute a query that searches across multiple clusters
+### <u>Write and execute a query that searches across multiple clusters</u>
+
 REQUIRED SETUP:
  - WIP
 
 [cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html)
 
-## <a id="search_application">Developing Search Applications</a>
-### Highlight the search terms in the response of a query
+## <u><a id="search_application">Developing Search Applications</a></u>
+
+### <u>Highlight the search terms in the response of a query</u>
+
 REQUIRED SETUP:
  - an index named `multitype` with previously indexed documents exists in the cluster
 
@@ -1240,7 +1253,8 @@ GET multitype/_search
 </details>
 
 
-### Sort the results of a query by a given set of requirements
+### <u>Sort the results of a query by a given set of requirements</u>
+
 REQUIRED SETUP:
  - the index `notes` created in the boolean exercise
 
@@ -1270,11 +1284,12 @@ GET notes/_search
 </details>
 As seen in the documentation, sorts can be much, much more complex than this.
 
-### Implement pagination of the results of a search query
+### <u>Implement pagination of the results of a search query</u>
 
 [Search query pagination](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/paginate-search-results.html)
 
-### Define and use index aliases
+### <u>Define and use index aliases</u>
+
 REQUIRED SETUP:
  - a running Elasticsearch cluster with at least one node and a Kibana instance,
  - the cluster has no index with name `hamlet`, 
@@ -1378,7 +1393,7 @@ POST hamlet/_doc/8
 
 
 
-### Define and use a search template
+### <u>Define and use a search template</u>
 
 [Search template](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/search-template.html)
 
@@ -1444,8 +1459,9 @@ PUT _scripts/notes_template
 
 
 
-## <a id="data_processing">Data Processing</a>
-### Define a mapping that satisfies a given set of requirements
+## <u><a id="data_processing">Data Processing</a></u>
+
+### <u>Define a mapping that satisfies a given set of requirements</u>
 
 #### Create the index `multitype` with (i) a `geoloc` field of type `geo_point` (ii) an `id` field of type `keyword` (iii) a field `phrase` of type `text` with the analyzer `french` (iv) a field `ip` of type `ip` and (v) an alias field to `phrase` named `french`.
 
@@ -1485,7 +1501,8 @@ PUT multitype
   
 
 
-### Define and use a custom analyzer that satisfies a given set of requirements
+### <u>Define and use a custom analyzer that satisfies a given set of requirements</u>
+
 REQUIRED SETUP :
 - no existing indice named `custom_ngram`
 
@@ -1551,7 +1568,8 @@ Le mot `Elle` est inclus dans les stopwords, donc il est exclu avant de passer d
 </details>
 
 
-### Define and use multi-fields with different data types and/or analyzers
+### <u>Define and use multi-fields with different data types and/or analyzers</u>
+
 Create an indice whose mapping satifies the following conditions :
 - the indice has only one field `text` of type `keyword`
 - the `text` field has a subfield `french` of type `text` that uses the `french` analyzer
@@ -1629,8 +1647,10 @@ PUT multifield
 
 
 
-### Use the Reindex API and Update By Query API to reindex and/or update documents
+### <u>Use the Reindex API and Update By Query API to reindex and/or update documents</u>
+
 #### Update the document with id "1" by adding a field named `line_number` with value "3.1.64"
+
 <details>
     <summary>Solution</summary>
 
@@ -1755,7 +1775,8 @@ POST hamlet/_update_by_query?conflicts=proceed
 ```
 </details>
 
-### Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents
+### <u>Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents</u>
+
 REQUIRED SETUP:
 - no existing index named `dissected` in cluster
 - no existing ingest pipeline named `postgresql_logs_pipeline` in cluster
@@ -1829,7 +1850,8 @@ curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --dat
 ```
 </details>
 
-### Configure an index so that it properly maintains the relationships of nested arrays of objects
+### <u>Configure an index so that it properly maintains the relationships of nested arrays of objects</u>
+
 REQUIRED SETUP:
 - No existing indice named `obj`
 
@@ -1937,10 +1959,16 @@ GET obj/_search
 
 
 
-## <a id="cluster_management">Cluster Management</a>
-### Diagnose shard issues and repair a cluster's health
-### Backup and restore a cluster and/or specific indices
-### Configure a snapshot to be searchable
-### Configure a cluster for cross-cluster search
-### Implement cross-cluster replication
-### Define role-based access control using Elasticsearch Security
+## <u><a id="cluster_management">Cluster Management</a></u>
+
+### <u>Diagnose shard issues and repair a cluster's health</u>
+
+### <u>Backup and restore a cluster and/or specific indices</u>
+
+### <u>Configure a snapshot to be searchable</u>
+
+### <u>Configure a cluster for cross-cluster search</u>
+
+### <u>Implement cross-cluster replication</u>
+
+### <u>Define role-based access control using Elasticsearch Security</u>
