@@ -1756,6 +1756,79 @@ POST hamlet/_update_by_query?conflicts=proceed
 </details>
 
 ### Define and use an ingest pipeline that satisfies a given set of requirements, including the use of Painless to modify documents
+REQUIRED SETUP:
+- no existing index named `dissected` in cluster
+- no existing ingest pipeline named `postgresql_logs_pipeline` in cluster
+
+The goal of this exercise is to learn how to split a log message into multiple fields using an [ingest pipeline](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html).
+
+The documents to index are those in `./course_material/bulk_postgre_logs`. This file contains a pre-formatted bulk request with documents having only a single field. The goal is to split this field in 4 different fields.
+
+You must do the following :
+- Figure out 4 fields to parse from the log entry
+- Create an ingest pipeline `postgresql_logs_pipeline` that parses the documents into multiple fields
+- Simulate your newly created pipeline against a single document to confirm it works as intended
+- Create the indice `dissected` and assign it `postgresql_logs_pipeline` as default pipeline
+- Execute the bulk request
+
+<details>
+    <summary>The 4 fields & how to name them</summary>
+
+```json
+{"log":"(2022-03-01 08:21:50.636 UTC) [(1)] (LOG):  (database system is ready to accept connections)"}
+```
+Each parenthesis pair is a field, we have : a timestamp, a number (here, those are the first two bytes of the SQLSTATE), the log level and a message.
+This is how we'll name each one : `@timestamp`, `SQLSTATE_class`, `severity` and `message`.
+</details>
+
+Then you must first find a processor that suits our needs. There are multiple ways to achieve our goal, but one processor is much simpler than the other options. You've already had an hint about which one it is... The rest is a matter of reading the documentation !
+
+<details>
+    <summary>The pipeline creation request</summary>
+
+```json
+PUT _ingest/pipeline/postgresql_logs_pipeline
+{
+  "description": "dissect postgreSQL logs",
+  "processors": [
+    {"dissect": {
+      "field": "log",
+      "pattern": "%{@timestamp} [%{SQLSTATE_class}] %{severity}: %{->} %{message}"
+    }}
+  ]
+}
+```
+Note the extra `%{->}` to strip our `message` field off leading spaces.
+</details>
+
+Before trying the actual indexation, you'll want to try your pipeline out. In the real world, indexing is what's consuming, so you really want to test as much as possible before trying the actual indexation. The `_simulation` endpoint is expained in the aforementioned [ingest pipeline documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html)
+
+<details>
+    <summary>Testing your pipeline with the _simulation endpoint</summary>
+
+```json
+POST _ingest/pipeline/postgresql_logs_pipeline/_simulate
+{
+  "docs": [
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}},
+    {"_source": {"log":"2022-02-21 08:31:00.119 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}}
+    ]
+}
+```
+The simulation works if there is no error & if you can see our 4 fields in the response's `_source`.
+</details>
+
+You should know how to execute a bulk request from a file if you followed the [practical guide](#practical_guide) attentively enough !
+
+<details>
+    <summary>Executing the bulk request</summary>
+
+```bash
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk' --data-binary @bulk_postgre_logs
+```
+</details>
+
 ### Configure an index so that it properly maintains the relationships of nested arrays of objects
 REQUIRED SETUP:
 - No existing indice named `obj`

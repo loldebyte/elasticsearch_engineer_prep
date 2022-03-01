@@ -1,0 +1,143 @@
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 08:31:00.114 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 08:31:00.119 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 08:31:00.127 UTC [21] LOG:  database system was shut down at 2022-02-18 16:09:42 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 08:31:00.133 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 16:33:31.661 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 16:33:31.663 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 16:33:31.664 UTC [1] LOG:  background worker 'logical replication launcher' (PID 27) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 16:33:31.664 UTC [22] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-21 16:33:31.680 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.233 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.233 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.233 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.237 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.244 UTC [21] LOG:  database system was shut down at 2022-02-21 16:33:31 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 08:20:04.251 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 16:37:47.108 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 16:37:47.113 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 16:37:47.115 UTC [1] LOG:  background worker 'logical replication launcher' (PID 27) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 16:37:47.115 UTC [22] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-22 16:37:47.172 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.070 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.071 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.071 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.073 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.077 UTC [21] LOG:  database system was shut down at 2022-02-22 16:37:47 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 09:46:59.082 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 17:00:15.754 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 17:00:15.757 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 17:00:15.760 UTC [1] LOG:  background worker 'logical replication launcher' (PID 27) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 17:00:15.760 UTC [22] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-23 17:00:15.800 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.749 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.749 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.749 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.752 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.760 UTC [22] LOG:  database system was shut down at 2022-02-23 17:00:15 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 07:58:14.766 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 16:46:54.363 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 16:46:54.365 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 16:46:54.366 UTC [1] LOG:  background worker 'logical replication launcher' (PID 28) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 16:46:54.366 UTC [23] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-24 16:46:54.382 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.297 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.297 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.297 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.300 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.305 UTC [22] LOG:  database system was shut down at 2022-02-24 16:46:54 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 07:35:31.309 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 16:40:10.313 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 16:40:10.317 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 16:40:10.317 UTC [1] LOG:  background worker 'logical replication launcher' (PID 28) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 16:40:10.317 UTC [23] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-25 16:40:10.331 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.958 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.959 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.959 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.966 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.973 UTC [23] LOG:  database system was shut down at 2022-02-25 16:40:10 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 08:00:31.983 UTC [1] LOG:  database system is ready to accept connections"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 17:10:53.885 UTC [1] LOG:  received fast shutdown request"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 17:10:53.887 UTC [1] LOG:  aborting any active transactions"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 17:10:53.888 UTC [1] LOG:  background worker 'logical replication launcher' (PID 29) exited with exit code 1"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 17:10:53.891 UTC [24] LOG:  shutting down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-02-28 17:10:53.924 UTC [1] LOG:  database system is shut down"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.624 UTC [1] LOG:  starting PostgreSQL 13.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 10.2.1_pre1) 10.2.1 20201203, 64-bit"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.624 UTC [1] LOG:  listening on IPv4 address '0.0.0.0', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.624 UTC [1] LOG:  listening on IPv6 address '::', port 5432"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.628 UTC [1] LOG:  listening on Unix socket '/var/run/postgresql/.s.PGSQL.5432'"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.632 UTC [22] LOG:  database system was shut down at 2022-02-28 17:10:53 UTC"}
+{"index":{"_index":"dissected"}}
+{"log":"2022-03-01 08:21:50.636 UTC [1] LOG:  database system is ready to accept connections"}
+
