@@ -1,16 +1,19 @@
 # General Tips
+
 All code snippets are taken from Kibana's `Dev Tools` console, unless stated otherwise.
 
 Try to come up with a solution before opening any "spoilers" in this document ! This also applies to the code snippets provided for testing !
 
 ## Recommended reads
+
 This [webinar](https://www.youtube.com/watch?v=9UpB-s_ZfNE) for details about the exam environment and a few exercices.
 
 [This article](https://www.linkedin.com/pulse/elastic-certified-engineer-exam-my-experience-how-i-surbhi-mahajan) for its concrete experience and recommendations.
 
-The official [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/elasticsearch-intro.html). Familiarity with the documentation is crucial.
+The official [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.15/elasticsearch-intro.html). Accustomation with the documentation is crucial.
 
 # Credits
+
 Sincere thanks to Guido Lena Cota for
 [his excellent article](https://medium.com/kreuzwerker-gmbh/exercises-for-the-elastic-certified-engineer-exam-store-data-into-elasticsearch-cbce230bcc6)
 whose exercises are included almost as-is, and was a major inspiration for the present document.
