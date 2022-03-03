@@ -2205,7 +2205,7 @@ PUT obj
 ```
 </details>
 
-Now, try to come up with a query that fails when it should, but also works when it should !
+Now, try to come up with a [query](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-nested-query.html) that fails when it should, but also works when it should !
 
 <details>
     <summary>Working query</summary>
@@ -2244,7 +2244,11 @@ GET obj/_search
 
 ### <u>Backup and restore a cluster and/or specific indices</u>
 
+[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.htmlhttps://trello.com/c/Hh4Hg7ef/5-cluster-management-course)
+
 ### <u>Configure a snapshot to be searchable</u>
+
+[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.htmlhttps://trello.com/c/Hh4Hg7ef/5-cluster-management-course)
 
 ### <u>Configure a cluster for cross-cluster search</u>
 
@@ -2253,3 +2257,5 @@ Refer to [cross cluster search](#cross_cluster_search)
 ### <u>Implement cross-cluster replication</u>
 
 ### <u>Define role-based access control using Elasticsearch Security</u>
+
+[TODO]: # (req : docker elastic cluster with security)
