@@ -36,6 +36,8 @@ whose exercises are included almost as-is, and was a major inspiration for the p
 
 # <a id="practical_guide"></a>Practical Guide
 
+## <u>Introductory Exercices</u>
+
 REQUIRED SETUP:
  - create an indice `hamlet-raw`
 
@@ -46,8 +48,6 @@ REQUIRED SETUP:
 PUT halmet-raw
 ```
 </details>
-
-## <u>Introductory Exercices</u>
 
 ### Add a document to `hamlet-raw`, so that the document (i) has id "1", (ii) has default type, (iii) has one field named `line` with value "To be, or not to be: that is the question"
 <details>
@@ -2242,19 +2242,23 @@ GET obj/_search
 
 ### <u>Diagnose shard issues and repair a cluster's health</u>
 
+[TODO]: # (req : docker elastic one cluster with multiple nodes)
+
 ### <u>Backup and restore a cluster and/or specific indices</u>
 
-[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.htmlhttps://trello.com/c/Hh4Hg7ef/5-cluster-management-course)
+[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
 
 ### <u>Configure a snapshot to be searchable</u>
 
-[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.htmlhttps://trello.com/c/Hh4Hg7ef/5-cluster-management-course)
+[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
 
 ### <u>Configure a cluster for cross-cluster search</u>
 
 Refer to [cross cluster search](#cross_cluster_search)
 
 ### <u>Implement cross-cluster replication</u>
+
+[TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
 
 ### <u>Define role-based access control using Elasticsearch Security</u>
 
