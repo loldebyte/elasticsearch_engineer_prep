@@ -1230,7 +1230,7 @@ You can access cluster1's kibana at `localhost:15601`. The first cluster is the 
 
 Cluster2's kibana is available at `localhost:5601`. We will search cluster1 from cluster2's devtools console.
 
-Before going further, we need to declare cluster1 as a remote cluster for cluster2. There are [3 ways](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/remote-clusters-connect.html) to do that : using kibana's UI, with the API or using static elasticsearch configuration (which requires modifying `docker-compose.yml` and restarting our containers). Pick whichever you like most.
+Before going further, we need to declare cluster1 as a remote cluster for cluster2. There are [3 ways](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/remote-clusters-connect.html) to do that : using kibana's UI, using the API or using static elasticsearch configuration (which requires modifying `docker-compose.multicluster.yaml` and restarting our containers). You can use whichever you like but I would recommend trying out each one.
 
 <details>
     <summary>UI remote cluster configuration</summary>
@@ -1305,7 +1305,7 @@ PUT my_indice_on_cluster_one/_doc
 ```
 </details>
 
-
+Once that's done you can search for these documents from cluster2's devtools !
 
 <details>
     <summary>Cross cluster search query</summary>
@@ -1315,6 +1315,33 @@ GET cluster_one:my_indice_on_cluster_one/_search
 ```
 And you should see the documents you created from cluster1's kibana console !
 </details>
+
+Some of you might have noticed that the goal was to search across **multiple** clusters, no just a single remote cluster. You will quickly realize that the remote cluster part really was the most difficult part indeed.
+
+First, let's index some documents in a `my_indice` indice on `cluster2` :
+
+<details>
+    <summary>Index on cluster2</summary>
+
+```json
+POST my_indice/_doc
+{
+  "field": "also junk"
+}
+```
+</details>
+
+And now, we can execute queries on [multiple clusters](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cross-cluster-search.html#ccs-search-multi-remote-cluster) just like we would execute queries on multiple indices in one cluster :
+
+<details>
+    <summary>Search multiple indices on multiple clusters</summary>
+
+```json
+GET my_indice,cluster_one:my_indice_on_cluster_one/_search
+```
+</details>
+
+We can use any of [these APIs](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/modules-cross-cluster-search.html#ccs-supported-apis) across remote clusters, and we can use these on as many indices (from either a remote or local cluster) as we'd like.
 
 ## <u><a id="search_application">Developing Search Applications</a></u>
 
