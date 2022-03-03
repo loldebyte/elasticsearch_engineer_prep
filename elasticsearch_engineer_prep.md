@@ -1222,9 +1222,99 @@ GET notes/_search
 ### <u>Write and execute a query that searches across multiple clusters</u>
 
 REQUIRED SETUP:
- - WIP
+ - Shutdown every local instances of elasticsearch & kibana
+ - Install [docker compose](https://docs.docker.com/compose/install/)
+ - Launch the dockerized elasticsearch clusters using `docker-compose -f "docker-compose.multicluster.yaml" up`
 
-[cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html)
+You can access cluster1's kibana at `localhost:15601`. The first cluster is the one we will execute the remote cluster search _against_.
+
+Cluster2's kibana is available at `localhost:5601`. We will search cluster1 from cluster2's devtools console.
+
+Before going further, we need to declare cluster1 as a remote cluster for cluster2. There are [3 ways](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/remote-clusters-connect.html) to do that : using kibana's UI, with the API or using static elasticsearch configuration (which requires modifying `docker-compose.yml` and restarting our containers). Pick whichever you like most.
+
+<details>
+    <summary>UI remote cluster configuration</summary>
+
+Go towards `Stack Management`>`Remote Clusters`. Enter `cluster_one` as remote cluster and `node2:9300` as seed node url. Lower the # of node connections to 1.
+</details>
+
+<details>
+    <summary>API remote cluster configuration</summary>
+
+Execute the following from kibana's devtools interface.
+```json
+PUT /_cluster/settings
+{
+  "persistent" : {
+    "cluster" : {
+      "remote" : {
+        "cluster_one" : {    
+          "seeds" : [
+            "node2:9300" 
+          ]
+        }
+      }
+    }
+  }
+}
+```
+Or if you'd rather use cURL :
+```bash
+curl -X PUT "localhost:9200/_cluster/settings?pretty" -H 'Content-Type: application/json' -d'
+{
+  "persistent" : {
+    "cluster" : {
+      "remote" : {
+        "cluster_one" : {    
+          "seeds" : [
+            "node2:9300" 
+          ]
+        }
+      }
+    }
+  }
+}
+'
+```
+</details>
+
+<details>
+    <summary>Static remote cluster configuration</summary>
+
+Edit the cluster2 service configuration by adding the following line below `environment` :
+```yaml
+cluster.remote.cluster_one.seeds=node2:9300
+```
+Restart the containers, and voilà !
+</details>
+
+The url we need to specify is the url to the docker service that hosts the [gateway node](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/remote-clusters.html#sniff-mode). Since we have a dedicated [remote node](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#remote-node) we simply need to enter his container's name (which is configured to be the same as the node's name). The port used for cross-cluster communication is the `transport port`, and we use its default value.
+
+Now we must do the actual [cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html) !
+
+Let's create an indice `my_indice_on_cluster_one` with some documents on `cluster1` so we have something to search first. Make sure to create said documents on `cluster1` !!
+
+<details>
+    <summary>Index documents in cluster1</summary>
+
+```json
+PUT my_indice_on_cluster_one/_doc
+{
+  "field": "junk"
+}
+```
+</details>
+
+
+
+<details>
+    <summary>Cross cluster search query</summary>
+
+```json
+GET cluster_one:my_indice_on_cluster_one/_search
+```
+And you should see the documents you created from cluster1's kibana console !
+</details>
 
 ## <u><a id="search_application">Developing Search Applications</a></u>
 

@@ -1,0 +1,132 @@
+version: "2.4"
+
+services:
+  node1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: node1
+    environment:
+      - node.roles=master
+      - node.name=node1
+      - cluster.name=cluster1
+      - discovery.seed_hosts=node2,node3
+      - cluster.initial_master_nodes=node1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - edata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+      - kib1
+
+  node2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: node2
+    environment:
+      - node.roles=remote_cluster_client
+      - node.name=node2
+      - cluster.name=cluster1
+      - discovery.seed_hosts=node1,node3
+      - cluster.initial_master_nodes=node1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - edata2:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
+    networks:
+      - elastic
+      - kib1
+
+  node3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: node3
+    environment:
+      - node.roles=data
+      - node.name=node3
+      - cluster.name=cluster1
+      - discovery.seed_hosts=node1,node2
+      - cluster.initial_master_nodes=node1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - edata3:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+    networks:
+      - elastic
+      - kib1
+
+  cluster2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: cluster2
+    environment:
+      - cluster.name=cluster2
+      - node.name=node4
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - transport.port=9400
+      - cluster.remote.cluster_one.seeds=node2:9300
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - edata4:/usr/share/elasticsearch/data
+    ports:
+      - 9250:9200
+    networks:
+      - elastic
+      - kib2
+
+  kibana1:
+    image: docker.elastic.co/kibana/kibana:7.17.1
+    container_name: kibana1
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://node1:9200","http://node2:9200","http://node3:9200"]'
+    ports:
+      - "15601:5601"
+    networks:
+      - kib1
+    depends_on:
+      - 'node1'
+      - 'node2'
+      - 'node3'
+
+  kibana2:
+    image: docker.elastic.co/kibana/kibana:7.17.1
+    container_name: kibana2
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://cluster2:9200"]'
+    ports:
+      - "5601:5601"
+    networks:
+      - kib2
+    depends_on:
+      - 'cluster2'
+
+
+volumes:
+  edata1:
+  edata2:
+  edata3:
+  edata4:
+
+networks:
+  elastic:
+  kib1:
+  kib2:
