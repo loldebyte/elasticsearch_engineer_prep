@@ -1219,7 +1219,7 @@ GET notes/_search
 ```
 </details>
 
-### <u>Write and execute a query that searches across multiple clusters</u>
+### <u><a id="cross_cluster_search">Write and execute a query that searches across multiple clusters</a></u>
 
 REQUIRED SETUP:
  - Shutdown every local instances of elasticsearch & kibana
@@ -1289,7 +1289,7 @@ Restart the containers, and voilà !
 </details>
 
 The url we need to specify is the url to the docker service that hosts the [gateway node](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/remote-clusters.html#sniff-mode). Since we have a dedicated [remote node](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html#remote-node) we simply need to enter his container's name (which is configured to be the same as the node's name). The port used for cross-cluster communication is the `transport port`, and we use its default value.
-
+https://trello.com/c/Hh4Hg7ef/5-cluster-management-course
 Now we must do the actual [cross cluster search](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-cross-cluster-search.html) !
 
 Let's create an indice `my_indice_on_cluster_one` with some documents on `cluster1` so we have something to search first. Make sure to create said documents on `cluster1` !!
@@ -2220,6 +2220,8 @@ GET obj/_search
 ### <u>Configure a snapshot to be searchable</u>
 
 ### <u>Configure a cluster for cross-cluster search</u>
+
+Refer to [cross cluster search](#cross_cluster_search)
 
 ### <u>Implement cross-cluster replication</u>
 
