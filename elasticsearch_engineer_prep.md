@@ -1310,7 +1310,7 @@ Once that's done you can search for these documents from cluster2's devtools !
 <details>
     <summary>Cross cluster search query</summary>
 
-```json
+```
 GET cluster_one:my_indice_on_cluster_one/_search
 ```
 And you should see the documents you created from cluster1's kibana console !
@@ -1336,7 +1336,7 @@ And now, we can execute queries on [multiple clusters](https://www.elastic.co/gu
 <details>
     <summary>Search multiple indices on multiple clusters</summary>
 
-```json
+```
 GET my_indice,cluster_one:my_indice_on_cluster_one/_search
 ```
 </details>
@@ -2240,6 +2240,10 @@ GET obj/_search
 
 ## <u><a id="cluster_management">Cluster Management</a></u>
 
+**NOTE** : most features in this section are not available in the basic license.
+
+Cross-cluster replication requires Platinium or Enterprise, searchable snapshots & recovery from snapshots both require Enterprise.
+
 ### <u>Diagnose shard issues and repair a cluster's health</u>
 
 [TODO]: # (req : docker elastic one cluster with multiple nodes)
@@ -2247,10 +2251,12 @@ GET obj/_search
 ### <u>Backup and restore a cluster and/or specific indices</u>
 
 [TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
+[TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
 
 ### <u>Configure a snapshot to be searchable</u>
 
 [TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
+[TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
 
 ### <u>Configure a cluster for cross-cluster search</u>
 
@@ -2258,7 +2264,23 @@ Refer to [cross cluster search](#cross_cluster_search)
 
 ### <u>Implement cross-cluster replication</u>
 
-[TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
+For this exercise, you must have setup a remote cluster, like is done in the [cross cluster search](#cross_cluster_search) exercise mentionned above. Once your remote cluster is setup, you must [create a follower indice](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/ccr-put-follow.html).
+
+Note that if you do not have a Platinium or Enterprise license, this feature is not supported. If that is the case, you'll have no way of checking your request as the same `security_exception` with reason `current license is non-compliant for [ccr]` is raised regardless of query validity.
+
+Here is what your request should look like if you've set everything up just like I did :
+
+<details>
+    <summary>Valid request</summary>
+
+```json
+PUT /my_junk/_ccr/follow?wait_for_active_shards=1
+{
+  "remote_cluster": "cluster_one",
+  "leader_index": "my_indice_on_cluster_one"
+}
+```
+</details>
 
 ### <u>Define role-based access control using Elasticsearch Security</u>
 
