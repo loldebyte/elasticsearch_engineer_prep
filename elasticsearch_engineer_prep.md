@@ -2244,16 +2244,37 @@ GET obj/_search
 
 Cross-cluster replication requires Platinium or Enterprise, searchable snapshots & recovery from snapshots both require Enterprise.
 
+For obvious reasons, this means these will probably not be _actually_ implemented in these exercises, we will merely go over the steps necessary to do so.
+
 ### <u>Diagnose shard issues and repair a cluster's health</u>
 
-[TODO]: # (req : docker elastic one cluster with multiple nodes)
+This exercise is about [cluster health](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/add-elasticsearch-nodes.html). If the previous doesn't satiate your curiosity, see [this](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/docs-replication.html).
+
+REQUIRED SETUP:
+ - Shutdown every local instances of elasticsearch & kibana
+ - Install [docker compose](https://docs.docker.com/compose/install/)
+ - Launch this exercise's cluster using `./scripts/start_cluster_to_repair.sh`
+
+Please do not look at the script before the exercise is done.
+
+Once the cluster is up and running, your goal is to get the cluster to `GREEN` health status ***without deleting any indice***. You need not restart the cluster either, everything can be done by modifying dynamic settings. Good luck !
+
+<details>
+    <summary>Solution</summary>
+
+There are 2 settings you need to change : `index.number_of_replicas`, because replicas cannot be allocated on the same node that the primary shard they are replicating and `index.routing.allocation.total_shards_per_node` to allow more than 3 shards per node for a specific index as documented [here](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/allocation-total-shards.html)
+</details>
 
 ### <u>Backup and restore a cluster and/or specific indices</u>
+
+Note that only the Enterprise license has access to the data restore from snapshots feature.
 
 [TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
 [TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
 
 ### <u>Configure a snapshot to be searchable</u>
+
+Note that only the Enterprise license has access to the searchable snapshots feature.
 
 [TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
 [TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
@@ -2281,6 +2302,8 @@ PUT /my_junk/_ccr/follow?wait_for_active_shards=1
 }
 ```
 </details>
+
+To implement automatic ccr see [this](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/ccr-put-auto-follow-pattern.html) page from the docs.
 
 ### <u>Define role-based access control using Elasticsearch Security</u>
 

@@ -1,0 +1,90 @@
+version: "2.4"
+
+services:
+  brokennode1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: brokennode1
+    environment:
+      - node.roles=master,data
+      - node.name=brokennode1
+      - cluster.name=cluster1
+      - discovery.seed_hosts=brokennode2,brokennode3
+      - cluster.initial_master_nodes=brokennode1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - brokendata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic_kibana
+
+  brokennode2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: brokennode2
+    environment:
+      - node.roles=data
+      - node.name=brokennode2
+      - cluster.name=cluster1
+      - discovery.seed_hosts=brokennode1,brokennode3
+      - cluster.initial_master_nodes=brokennode1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - brokendata2:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
+    networks:
+      - elastic_kibana
+
+  brokennode3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: brokennode3
+    environment:
+      - node.roles=data
+      - node.name=brokennode3
+      - cluster.name=cluster1
+      - discovery.seed_hosts=brokennode1,brokennode2
+      - cluster.initial_master_nodes=brokennode1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - brokendata3:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+    networks:
+      - elastic_kibana
+
+  brokenkibana:
+    image: docker.elastic.co/kibana/kibana:7.17.1
+    container_name: brokenkibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://brokennode1:9200","http://brokennode2:9200","http://brokennode3:9200"]'
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic_kibana
+    depends_on:
+      - 'brokennode1'
+      - 'brokennode2'
+      - 'brokennode3'
+
+volumes:
+  brokendata1:
+  brokendata2:
+  brokendata3:
+
+networks:
+  elastic_kibana:
