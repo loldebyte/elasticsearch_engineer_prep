@@ -599,7 +599,7 @@ Note index templates apply at index creation only, so `hamlet_test` will not hav
     <summary>bulk command</summary>
 
 ```json
-PUT hamlet-1/_doc/_bulk
+POST _bulk
 {"index":{"_index":"hamlet-1","_id":0}}
 {"line_number":"1.1.1","speaker":"BERNARDO","text_entry":"Whos there?"}
 {"index":{"_index":"hamlet-1","_id":1}}
