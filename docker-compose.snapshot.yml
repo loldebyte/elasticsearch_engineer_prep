@@ -1,0 +1,41 @@
+version: "2.4"
+
+services:
+  elasticsearch:
+    build: "."
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - path.repo=/usr/share/elasticsearch/snapshots
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data:/usr/share/elasticsearch/data
+      - backup:/usr/share/elasticsearch/snapshots
+    ports:
+      - 9200:9200
+    networks:
+      - elastic_kibana
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.1
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic_kibana
+    depends_on:
+      - 'elasticsearch'
+
+volumes:
+  data:
+  backup:
+
+networks:
+  elastic_kibana:
