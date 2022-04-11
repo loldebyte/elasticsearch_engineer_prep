@@ -2236,8 +2236,6 @@ GET obj/_search
 ```
 </details>
 
-
-
 ## <u><a id="cluster_management">Cluster Management</a></u>
 
 **NOTE** : most features in this section are not available in the basic license.
@@ -2269,8 +2267,66 @@ There are 2 settings you need to change : `index.number_of_replicas`, because re
 
 Note that only the Enterprise license has access to the data restore from snapshots feature.
 
-[TODO]: # (https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html)
-[TODO]: # (req : docker elastic cluster with extra volume or swap the volume)
+I encourage you to learn about the purpose and role of snapshots by reading the [documentation](https://elastic.co/guide/en/elasticsearch/reference/7.17/snapshot-restore.html).
+
+Before actually [taking snapshots](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/snapshots-take-snapshot.html) one must first tell elasticsearch where to save them. This is done by [registering a snapshot repository](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-register-repository.html).
+
+First things first : start the containers pre-configured for snapshots (or try and create your own, if you dare !) : 
+`docker-compose -f "./docker-compose.snapshot.yml" up`
+
+<details>
+    <summary>I'm curious ! What's different between this one and the 'regular' docker-compose.yml ??</summary>
+
+Great question ! As I hinted at earlier : elasticsearch needs some place to store snapshots, and none is configured by default.
+
+Thus, the changes can be boiled down to:
+ - creating another volume where the snapshots will be saved
+ - allowing the elasticsearch user to write in said volume (the elasticsearch image does this by itself for everything it needs)
+</details>
+
+Next, we need to register our snapshot repository ! You can find out the path in the docker-compose file :)
+
+<details>
+    <summary>... or I can tell you if you don't know nor care about docker</summary>
+
+The path opened for the snapshot repository is `/usr/share/elasticsearch/snapshots`.
+</details>
+
+To check if you've done good, you should [verify](https://www.elastic.co/guide/en/elasticsearch/reference/current/verify-snapshot-repo-api.html) your snapshot repository.
+
+<details>
+    <summary>Gimme the query to test out my repo !</summary>
+
+```json
+POST _snapshot/repo/_verify
+```
+</details>
+
+<details>
+    <summary>If you _really_ struggle, here's a creation request</summary>
+
+```json
+PUT _snapshot/repo
+{
+  "type": "fs",
+  "settings": {
+    "location": "/usr/share/elasticsearch/snapshots"
+  }
+}
+```
+</details>
+
+Once that's done, you should be able to successfully [take a manual snapshot](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/snapshots-take-snapshot.html#manually-create-snapshot) !
+
+<details>
+    <summary>A pre-made request for the lazy ones</summary>
+
+```json
+PUT _snapshot/repo/my_first_snapshot?wait_for_completion=true
+```
+</details>
+
+[TODO]: # (snapshot lifecycle policy SLP)
 
 ### <u>Configure a snapshot to be searchable</u>
 
