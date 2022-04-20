@@ -2326,7 +2326,33 @@ PUT _snapshot/repo/my_first_snapshot?wait_for_completion=true
 ```
 </details>
 
-[TODO]: # (snapshot lifecycle policy SLP)
+Now that you know how to create manual snapshots, it's time to take on the _real_ deal : automated snapshots. To implement that we need to use [Snapshot Policies](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/snapshots-take-snapshot.html#create-slm-policy)
+
+The snapshot policy you have to implement should:
+ - be named `weeky-snapshot`
+ - take a snapshot every week, on Sunday, at 1:00 am.
+ - delete old snapshots after 15 days
+ - have a minimum snapshot count of 1
+
+You use either method (API or UI), but in both cases you will check against the request.
+
+<details>
+    <summary>Request to test against</summary>
+
+```json
+PUT _slm/policy/weekly-snapshot
+{
+  "name": "week-{now/d}",
+  "schedule": "0 0 1 ? * 1",
+  "repository": "repo",
+  "config": {},
+  "retention": {
+    "expire_after": "15d",
+    "min_count": 1
+  }
+}
+```
+</details>
 
 ### <u>Configure a snapshot to be searchable</u>
 
